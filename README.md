@@ -1,10 +1,18 @@
 # Dockit
 ## - What is this?
-Fuzzy current location to git pull with all submodules or launch, close and exec container through docker-compose.
+Fuzzy the current location or appoint specific project name to
+- git
+  + pull repository and all submodules
+
+- docker
+  + launch the same prefix service with current project
+  + close the same prefix service with current project
+  + execute the container with the same as project
+
 
 ## - How to install
 ```bash
-pip install Dockit
+pip install dockit
 ```
 
 ## - How to use
@@ -12,7 +20,7 @@ pip install Dockit
 ### CLI
 
 ```bash
-dockit.py [-h] [-n PROJECT_NAME] [-p] [-l] [-c] [-r] [-s]
+dockit [-h] [-n PROJECT_NAME] [-p] [-s] [-l] [-u] [-e] [-d] [-c]
 ```
 
 #### -h, --help
@@ -25,13 +33,19 @@ dockit.py [-h] [-n PROJECT_NAME] [-p] [-l] [-c] [-r] [-s]
 > pull git repository and all sub repositories
 
 #### -l, --docker-launch-service
-> launch service in the same prefix project
+> parse project prefix and launch ${PREFIX}_service
+
+#### -u, --docker-up-container
+> docker-compose up -d container
+
+#### -d, --docker-down-container
+> docker-compose down container
 
 #### -c, --docker-close-service
-> close service in the same prefix project
+> parse project prefix and close ${PREFIX}_service
 
-#### -r, --docker-exec-container
-> exec docker container
+#### -e, --docker-exec-container
+> docker exec -it container bash
 
 #### -s, --docker-show-containers
 > show docker processes

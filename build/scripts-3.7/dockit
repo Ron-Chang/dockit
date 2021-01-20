@@ -1,3 +1,0 @@
-#!python
-from dockit import Dockit
-Dockit.cli()

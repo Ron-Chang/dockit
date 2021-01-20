@@ -154,7 +154,7 @@ class Dockit:
     def _pull_command(path):
         repo = path.split('/')[-1]
         info = subprocess.getoutput(f'git -C {path} pull')
-        if 'Already up to date.' in info:
+        if '已經是最新的' in info or 'Already up to date.' in info:
             return f'{ColorTag.YELLOW} {repo:<30} {ColorTag.GREEN}✔︎ {ColorTag.ON_GRAY}  {info}  {ColorTag.RESET}'
         return f'{ColorTag.YELLOW} {repo} {ColorTag.RESET}\n{info}'
 

@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: dockit
-Version: 0.0.9
+Version: 0.1.0
 Summary: Fuzzy current location to git pull with all submodules or launch, close and exec container through docker-compose.
 Home-page: https://github.com/Ron-Chang/dockit.git
 Author: Ron Chang

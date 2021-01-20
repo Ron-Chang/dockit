@@ -278,7 +278,7 @@ class Dockit:
         if args.docker_launch_service:
             cls._launch_docker_service()
         if args.docker_up_container:
-            is_attach = args.docker_attach_containers
+            is_attach = args.docker_attach_container
             cls._up_container(is_attach=is_attach)
         if args.docker_exec_container:
             cls._exec_container()

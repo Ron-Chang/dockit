@@ -1,3 +1,6 @@
+"""
+Ron's lazy CLI set
+"""
 import argparse
 import os
 import subprocess

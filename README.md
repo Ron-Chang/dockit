@@ -12,12 +12,29 @@ pip install Dockit
 ### CLI
 
 ```bash
-dockit -p
+dockit.py [-h] [-n PROJECT_NAME] [-p] [-l] [-c] [-r] [-s]
 ```
 
-```bash
-dockit -c
-```
+#### -h, --help
+> show this help message and exit
+
+#### -n, --project-name
+> appoint specific project name
+
+#### -p, --git-pull
+> pull git repository and all sub repositories
+
+#### -l, --docker-launch-service
+> launch service in the same prefix project
+
+#### -c, --docker-close-service
+> close service in the same prefix project
+
+#### -r, --docker-exec-container
+> exec docker container
+
+#### -s, --docker-show-containers
+> show docker processes
 
 If you like my work, please consider buying me a coffee or [PayPal](https://paypal.me/RonDevStudio?locale.x=zh_TW)
 Thanks for your support! Cheers! 🎉

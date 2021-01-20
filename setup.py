@@ -18,6 +18,6 @@ setup(
     packages=find_packages(),
     license='MIT',
     python_requires='>=3.6',
-    exclude_package_date={'':['.gitignore', 'img', 'dev', 'test', 'setup.py']},
+    exclude_package_date={'':['.gitignore', 'asset', 'test', 'setup.py']},
     scripts=['bin/dockit'],
 )

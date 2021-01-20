@@ -20,7 +20,7 @@ pip install dockit
 ### CLI
 
 ```bash
-dockit [-h] [-n PROJECT_NAME] [-p] [-s] [-l] [-u] [-e] [-d] [-c]
+dockit [-h] [-n PROJECT_NAME] [-p] [-l] [-u] [-a] [-d] [-c] [-e] [-s]
 ```
 
 #### -h, --help

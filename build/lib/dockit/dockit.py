@@ -47,21 +47,23 @@ class Dockit:
 
     optional arguments:
       -h, --help            show this help message and exit
+      -p, --git-pull        pull git repository and all sub repositories
       -n PROJECT_NAME, --project-name PROJECT_NAME
                             appoint specific project name
-      -p, --git-pull        pull git repository and all sub repositories
-      -s, --docker-show-containers
-                            show docker processes
+      -a, --docker-attach-container
+                            to keep attaching mode after docker-compose upped
       -l, --docker-launch-service
                             parse project prefix and launch ${PREFIX}_service
-      -u, --docker-up-container
-                            up docker container
-      -e, --docker-exec-container
-                            exec docker container
-      -d, --docker-down-container
-                            down docker container
       -c, --docker-close-service
                             parse project prefix and close ${PREFIX}_service
+      -u, --docker-up-container
+                            docker-compose up -d container with the same name as project
+      -d, --docker-down-container
+                            docker-compose down container with the same name as project
+      -e, --docker-exec-container
+                            docker exec -it container bash
+      -s, --docker-show-containers
+                            show docker processes
     """
 
     _PROJECT_PATH = str()
@@ -87,14 +89,14 @@ class Dockit:
             type=str,
         )
         parser.add_argument(
+            '-a', '--docker-attach-container',
+            action='store_true',
+            help='to keep attaching mode after docker-compose upped',
+        )
+        parser.add_argument(
             '-p', '--git-pull',
             action='store_true',
             help='pull git repository and all sub repositories',
-        )
-        parser.add_argument(
-            '-s', '--docker-show-containers',
-            action='store_true',
-            help='show docker processes',
         )
         parser.add_argument(
             '-l', '--docker-launch-service',
@@ -102,24 +104,29 @@ class Dockit:
             help='parse project prefix and launch ${PREFIX}_service',
         )
         parser.add_argument(
-            '-u', '--docker-up-container',
+            '-c', '--docker-close-service',
             action='store_true',
-            help='up docker container',
+            help='parse project prefix and close ${PREFIX}_service',
         )
         parser.add_argument(
-            '-e', '--docker-exec-container',
+            '-u', '--docker-up-container',
             action='store_true',
-            help='exec docker container',
+            help='docker-compose up -d container with the same name as project',
         )
         parser.add_argument(
             '-d', '--docker-down-container',
             action='store_true',
-            help='down docker container',
+            help='docker-compose down container with the same name as project',
         )
         parser.add_argument(
-            '-c', '--docker-close-service',
+            '-e', '--docker-exec-container',
             action='store_true',
-            help='parse project prefix and close ${PREFIX}_service',
+            help='docker exec -it container bash',
+        )
+        parser.add_argument(
+            '-s', '--docker-show-containers',
+            action='store_true',
+            help='show docker processes',
         )
         return parser.parse_args()
 
@@ -223,13 +230,16 @@ class Dockit:
         )
 
     @classmethod
-    def _up_container(cls):
+    def _up_container(cls, is_attach):
         container = cls._PROJECT_NAME
         if not container:
             raise Exception('cannot parse project name')
         pathname = os.path.expanduser(f'~/{container}/docker-compose.yml')
         cls._show_up_info(container=container)
-        os.system(f'docker-compose -f "{pathname}" up -d')
+        command = f'docker-compose -f "{pathname}" up'
+        if is_attach:
+            os.system(command)
+        os.system(f'{command} -d')
 
     @classmethod
     def _show_down_info(cls, container):
@@ -265,16 +275,16 @@ class Dockit:
             cls._git_pull()
 
         """ CONTAINER """
-        if args.docker_show_containers:
-            cls._show_containers()
         if args.docker_launch_service:
             cls._launch_docker_service()
         if args.docker_up_container:
-            cls._up_container()
+            is_attach = args.docker_attach_containers
+            cls._up_container(is_attach=is_attach)
         if args.docker_exec_container:
             cls._exec_container()
         if args.docker_down_container:
             cls._down_container()
         if args.docker_close_service:
             cls._close_docker_service()
-
+        if args.docker_show_containers:
+            cls._show_containers()

@@ -35,11 +35,14 @@ dockit [-h] [-n PROJECT_NAME] [-p] [-s] [-l] [-u] [-e] [-d] [-c]
 #### -l, --docker-launch-service
 > parse project prefix and launch ${PREFIX}_service
 
-#### -u, --docker-up-container
-> docker-compose up -d container
+#### -u, --docker-up-service
+> docker-compose up -d container with the same name as project
 
-#### -d, --docker-down-container
-> docker-compose down container
+#### -a, --docker-attach-container
+> to keep attaching mode after docker-compose upped
+
+#### -d, --docker-down-service
+> docker-compose down container with the same name as project
 
 #### -c, --docker-close-service
 > parse project prefix and close ${PREFIX}_service

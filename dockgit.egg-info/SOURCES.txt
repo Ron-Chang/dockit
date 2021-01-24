@@ -1,0 +1,10 @@
+README.md
+setup.py
+bin/dockgit
+dockgit/__init__.py
+dockgit/dockgit.py
+dockgit/test.py
+dockgit.egg-info/PKG-INFO
+dockgit.egg-info/SOURCES.txt
+dockgit.egg-info/dependency_links.txt
+dockgit.egg-info/top_level.txt

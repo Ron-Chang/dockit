@@ -230,14 +230,16 @@ class Dockit:
         )
 
     @classmethod
-    def _up_container(cls, is_attach):
-        container = cls._PROJECT_NAME
-        if not container:
+    def _up_container(cls, args):
+        if not cls._PROJECT_NAME:
             raise Exception('cannot parse project name')
-        pathname = os.path.expanduser(f'~/{container}/docker-compose.yml')
-        cls._show_up_info(container=container)
-        command = f'docker-compose -f "{pathname}" up'
-        if is_attach:
+        cls._show_up_info(container=cls._PROJECT_NAME)
+        if args.project_name:
+            pathname = os.path.expanduser(f'~/{cls._PROJECT_NAME}/docker-compose.yml')
+            command = f'docker-compose -f "{pathname}" up'
+        else:
+            command = f'docker-compose up'
+        if args.docker_attach_container:
             os.system(command)
         os.system(f'{command} -d')
 
@@ -249,13 +251,16 @@ class Dockit:
         )
 
     @classmethod
-    def _down_container(cls):
-        container = cls._PROJECT_NAME
-        if not container:
+    def _down_container(cls, args):
+        if not cls._PROJECT_NAME:
             raise Exception('cannot parse project name')
-        pathname = os.path.expanduser(f'~/{container}/docker-compose.yml')
-        cls._show_down_info(container=container)
-        os.system(f'docker-compose -f "{pathname}" down')
+        cls._show_down_info(container=cls._PROJECT_NAME)
+        if args.project_name:
+            pathname = os.path.expanduser(f'~/{cls._PROJECT_NAME}/docker-compose.yml')
+            command = f'docker-compose -f "{pathname}" down'
+        else:
+            command = f'docker-compose down'
+        os.system(command)
 
     @classmethod
     def _show_containers(cls):
@@ -278,13 +283,13 @@ class Dockit:
         if args.docker_launch_service:
             cls._launch_docker_service()
         if args.docker_up_container:
-            is_attach = args.docker_attach_container
-            cls._up_container(is_attach=is_attach)
+            cls._up_container(args=args)
         if args.docker_exec_container:
             cls._exec_container()
         if args.docker_down_container:
-            cls._down_container()
+            cls._down_container(args=args)
         if args.docker_close_service:
             cls._close_docker_service()
         if args.docker_show_containers:
             cls._show_containers()
+

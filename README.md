@@ -9,11 +9,11 @@ Fuzzy the current location or appoint specific project name to
   + close the same prefix service with current project
   + execute the container with the same as project
 
-## - Log
+## - History
 
-|#|      date|version|
-|-|----------|-------|
-|1|2020/01/24| v0.1.2|
+|#|      date|                                            version|
+|-|----------|---------------------------------------------------|
+|1|2020/01/24| [v0.1.2](https://github.com/Ron-Chang/dockit#v012)|
 
 #### v0.1.2
 - Fixed dockit -u & -d cannot work properly when the project not located at $HOME directory.

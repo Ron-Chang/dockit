@@ -14,9 +14,12 @@ Fuzzy the current location or appoint specific project name to
 |#|      date|                                            version|
 |-|----------|---------------------------------------------------|
 |1|2020/01/24| [v0.1.2](https://github.com/Ron-Chang/dockit#v012)|
+|2|2020/01/27| [v0.1.4](https://github.com/Ron-Chang/dockit#v014)|
 
 #### v0.1.2
 - Fixed dockit -u & -d cannot work properly when the project not located at $HOME directory.
+#### v0.1.4
+- Replaced whole color module.
 
 ## - How to install
 ```bash

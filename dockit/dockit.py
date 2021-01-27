@@ -6,30 +6,55 @@ import os
 import subprocess
 import sys
 
+class Dyer:
 
-class ColorTag:
-    RESET = '\x1b[0m'
+    _RESETALL = '\x1b[0m'
+    _STYLE = '\x1b[{style}'
+    _FG = '3{fg}'
+    _BG = '4{bg}'
 
-    RED = '\x1b[5;31;40m'
-    BLUE = '\x1b[5;34;40m'
-    CYAN = '\x1b[5;36;40m'
-    GRAY = '\x1b[5;37;40m'
-    GREEN = '\x1b[5;32;40m'
-    YELLOW = '\x1b[5;33;40m'
+    class Style:
+        NORMAL = 0
+        BOLD = 1
+        DARK = 2
+        ITALIC = 3
+        UNDERSCORE = 4
+        BLINK_SLOW = 5
+        BLINK_FAST = 6
+        REVERSE = 7
+        HIDE = 8
+        STRIKE_THROUGH = 9
 
-    ON_RED = '\x1b[5;30;41m'
-    ON_BLUE = '\x1b[5;30;44m'
-    ON_CYAN = '\x1b[5;30;46m'
-    ON_GRAY = '\x1b[5;30;47m'
-    ON_GREEN = '\x1b[5;30;42m'
-    ON_YELLOW = '\x1b[5;30;43m'
+    class Color:
+        BLACK = 0
+        RED = 1
+        GREEN = 2
+        YELLOW = 3
+        BLUE = 4
+        PURPLE = 5
+        CYAN = 6
+        GRAY = 7
 
-    RED_ON_YELLOW = '\x1b[5;31;43m'
-    BLUE_ON_YELLOW = '\x1b[3;34;43m'
-    GRAY_ON_CYAN = '\x1b[3;37;46m'
-    GRAY_ON_RED = '\x1b[3;37;41m'
-    YELLOW_ON_RED = '\x1b[5;33;41m'
-    YELLOW_ON_BLUE = '\x1b[5;33;44m'
+    @classmethod
+    def _validate(cls, fg, bg):
+        if fg is None and bg is None:
+            raise ValueError('fg and bg either one of them is required.')
+        if fg not in cls.Color.__dict__.values():
+            raise ValueError('fg color code is out of range.')
+        if bg not in cls.Color.__dict__.values():
+            raise ValueError('bg color code is out of range.')
+
+    @classmethod
+    def dye(cls, fg=None, bg=None, style=None):
+        cls._validate(fg=fg, bg=bg)
+        style_tag = f'\x1b[{cls.Style.NORMAL};' if style is None else f'\x1b[{style};'
+        fg_tag = f'30' if fg is None else f'3{fg}'
+        bg_tag = '' if bg is None else f';4{bg}'
+        return f'{style_tag}{fg_tag}{bg_tag}m'
+
+    @classmethod
+    def reset(cls):
+        return cls._RESETALL
 
 
 class Dockit:
@@ -65,6 +90,31 @@ class Dockit:
       -s, --docker-show-containers
                             show docker processes
     """
+
+    _RESET = Dyer.reset()
+    _FG_RED = Dyer.dye(fg=Dyer.Color.RED)
+    _BG_RED = Dyer.dye(bg=Dyer.Color.RED)
+
+    _FG_BLUE = Dyer.dye(fg=Dyer.Color.BLUE)
+    _BG_BLUE = Dyer.dye(bg=Dyer.Color.BLUE)
+
+    _FG_CYAN = Dyer.dye(fg=Dyer.Color.CYAN)
+    _BG_CYAN = Dyer.dye(bg=Dyer.Color.CYAN)
+
+    _FG_GRAY = Dyer.dye(fg=Dyer.Color.GRAY)
+    _BG_GRAY = Dyer.dye(bg=Dyer.Color.GRAY)
+
+    _FG_GREEN = Dyer.dye(fg=Dyer.Color.GREEN)
+    _BG_GREEN = Dyer.dye(bg=Dyer.Color.GREEN)
+
+    _FG_YELLOW = Dyer.dye(fg=Dyer.Color.YELLOW)
+    _BG_YELLOW = Dyer.dye(bg=Dyer.Color.YELLOW)
+
+    _BLUE_ON_YELLOW = Dyer.dye(fg=Dyer.Color.BLUE, bg=Dyer.Color.YELLOW)
+    _GRAY_ON_CYAN = Dyer.dye(fg=Dyer.Color.GRAY, bg=Dyer.Color.CYAN)
+    _GRAY_ON_RED = Dyer.dye(fg=Dyer.Color.GRAY, bg=Dyer.Color.RED)
+    _YELLOW_ON_RED = Dyer.dye(fg=Dyer.Color.YELLOW, bg=Dyer.Color.RED)
+    _YELLOW_ON_BLUE = Dyer.dye(fg=Dyer.Color.YELLOW, bg=Dyer.Color.BLUE)
 
     _PROJECT_PATH = str()
     _PROJECT_NAME = str()
@@ -150,13 +200,13 @@ class Dockit:
         stdout = subprocess.getoutput(f'grep path \'{cls._PROJECT_PATH}/.gitmodules\' | sed \'s/.*= //\'')
         return {f'{cls._PROJECT_PATH}/{submodule}' for submodule in stdout.split('\n')}
 
-    @staticmethod
-    def _pull_command(path):
+    @classmethod
+    def _pull_command(cls, path):
         repo = path.split('/')[-1]
         info = subprocess.getoutput(f'git -C {path} pull')
         if '已經是最新的' in info or 'Already up to date.' in info:
-            return f'{ColorTag.YELLOW} {repo:<30} {ColorTag.GREEN}✔︎ {ColorTag.ON_GRAY}  {info}  {ColorTag.RESET}'
-        return f'{ColorTag.YELLOW} {repo} {ColorTag.RESET}\n{info}'
+            return f'{cls._FG_YELLOW} {repo:<30} {cls._FG_GREEN}✔︎ {cls._BG_GRAY}  {info}  {cls._RESET}'
+        return f'{cls._FG_YELLOW} {repo} {cls._RESET}\n{info}'
 
     @classmethod
     def _git_pull(cls):
@@ -164,18 +214,18 @@ class Dockit:
         grep path '{cls._PROJECT_PATH}/.gitmodules' | sed 's/.*= //' | xargs -I@ git -C {cls._PROJECT_PATH}/@ pull
         """
         info = cls._pull_command(path=cls._PROJECT_PATH)
-        print(f'{ColorTag.ON_BLUE} {"REPOSITORY":10}  {ColorTag.RESET} {info}')
+        print(f'{cls._BG_BLUE} {"REPOSITORY":10}  {cls._RESET} {info}')
         if not os.path.isfile(f'{cls._PROJECT_PATH}/.gitmodules'):
             sys.exit()
         for submodule in cls._get_submodules():
             info = cls._pull_command(path=submodule)
-            print(f'{ColorTag.ON_CYAN}  {"SUBMODULE":10}  {ColorTag.RESET} {info}')
+            print(f'{cls._BG_CYAN}  {"SUBMODULE":10}  {cls._RESET} {info}')
 
     @classmethod
     def _show_launch_service_info(cls, service):
         print (
-            f'{ColorTag.BLUE} {ColorTag.ON_BLUE} LAUNCH {ColorTag.YELLOW_ON_BLUE} {ColorTag.RESET}'
-            f'{ColorTag.ON_YELLOW} {service} {ColorTag.YELLOW}{ColorTag.RESET}'
+            f'{cls._FG_BLUE} {cls._BG_BLUE} LAUNCH {cls._YELLOW_ON_BLUE} {cls._RESET}'
+            f'{cls._BG_YELLOW} {service} {cls._FG_YELLOW}{cls._RESET}'
         )
 
     @classmethod
@@ -190,8 +240,8 @@ class Dockit:
     @classmethod
     def _show_close_service_info(cls, service):
         print (
-            f'{ColorTag.YELLOW}{ColorTag.ON_YELLOW} {service} {ColorTag.YELLOW_ON_RED} {ColorTag.RESET}'
-            f'{ColorTag.ON_RED} CLOSE {ColorTag.RED}  {ColorTag.RESET}'
+            f'{cls._FG_YELLOW}{cls._BG_YELLOW} {service} {cls._YELLOW_ON_RED} {cls._RESET}'
+            f'{cls._BG_RED} CLOSE {cls._FG_RED}  {cls._RESET}'
         )
 
     @classmethod
@@ -208,8 +258,8 @@ class Dockit:
         os.system('clear')
         print (
             f'{"  CONTAINER ":^{cls._TERMINAL_SIZE_WIDTH}}\n'
-            f'{ColorTag.BLUE} {ColorTag.ON_BLUE} EXEC {ColorTag.BLUE_ON_YELLOW} {ColorTag.RESET}'
-            f'{ColorTag.ON_YELLOW}   {container} {ColorTag.YELLOW}  {ColorTag.RESET}'
+            f'{cls._FG_BLUE} {cls._BG_BLUE} EXEC {cls._BLUE_ON_YELLOW} {cls._RESET}'
+            f'{cls._BG_YELLOW}   {container} {cls._FG_YELLOW}  {cls._RESET}'
         )
 
     @classmethod
@@ -225,8 +275,8 @@ class Dockit:
     @classmethod
     def _show_up_info(cls, container):
         print (
-            f'{ColorTag.GRAY}{ColorTag.ON_GRAY}   {container} {ColorTag.GRAY_ON_CYAN}  {ColorTag.RESET}'
-            f'{ColorTag.ON_CYAN}{"UP":^10}{ColorTag.CYAN} {ColorTag.RESET}'
+            f'{cls._FG_GRAY}{cls._BG_GRAY}   {container} {cls._GRAY_ON_CYAN}  {cls._RESET}'
+            f'{cls._BG_CYAN}{"UP":^10}{cls._FG_CYAN} {cls._RESET}'
         )
 
     @classmethod
@@ -246,8 +296,8 @@ class Dockit:
     @classmethod
     def _show_down_info(cls, container):
         print (
-            f'{ColorTag.GRAY}{ColorTag.ON_GRAY}   {container} {ColorTag.GRAY_ON_RED}  {ColorTag.RESET}'
-            f'{ColorTag.ON_RED}{"DOWN":^10}{ColorTag.RED} {ColorTag.RESET}'
+            f'{cls._FG_GRAY}{cls._BG_GRAY}   {container} {cls._GRAY_ON_RED}  {cls._RESET}'
+            f'{cls._BG_RED}{"DOWN":^10}{cls._FG_RED} {cls._RESET}'
         )
 
     @classmethod

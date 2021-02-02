@@ -2,12 +2,12 @@
 ## - What is this?
 Fuzzy the current location or appoint specific project name to
 - git
-  + pull repository and all submodules
+  + pull repository and all submodules under the repo in anywhere.
 
 - docker
-  + launch the same prefix service with current project
-  + close the same prefix service with current project
-  + execute the container with the same as project
+  + up/down the service which is the "${current_repo_prefix}_service" if not specify.
+  + up/down the container which is the current repo if not specify.
+  + execute the container with the same name as the repo.
 
 ## - History
 
@@ -64,6 +64,21 @@ dockit.py [-h] [-a] [-p] [-l] [-c] [-u] [-d] [-e] [-s] [project]
 
 #### -s, --docker-show-containers
 > show docker processes
+
+```bash
+# .bashrc or .zshrc
+alias gitpull="dockit -p"
+alias run="dockit -e"
+alias up="dockit -u"
+alias uu="dockit -l"
+alias uuu="dockit -lu"
+alias uur="dockit -lue"
+alias uura="dockit -luea"
+alias down="dockit -d"
+alias dd="dockit -c"
+alias ddd="dockit -cd"
+alias dps="dockit -s"
+```
 
 If you like my work, please consider buying me a coffee or [PayPal](https://paypal.me/RonDevStudio?locale.x=zh_TW)
 Thanks for your support! Cheers! 🎉

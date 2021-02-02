@@ -15,11 +15,15 @@ Fuzzy the current location or appoint specific project name to
 |-|----------|---------------------------------------------------|
 |1|2020/01/24| [v0.1.2](https://github.com/Ron-Chang/dockit#v012)|
 |2|2020/01/27| [v0.1.4](https://github.com/Ron-Chang/dockit#v014)|
+|3|2020/02/02| [v0.1.5](https://github.com/Ron-Chang/dockit#v015)|
 
 #### v0.1.2
 - Fixed dockit -u & -d cannot work properly when the project not located at $HOME directory.
 #### v0.1.4
 - Replaced whole color module.
+#### v0.1.5
+- Fixed display bug while remote added new branches.
+- Removed optional argument `-n`, use positional argument instead.(default:basename of $pwd)
 
 ## - How to install
 ```bash
@@ -31,14 +35,11 @@ pip install dockit
 ### CLI
 
 ```bash
-dockit [-h] [-n PROJECT_NAME] [-p] [-l] [-u] [-a] [-d] [-c] [-e] [-s]
+dockit.py [-h] [-a] [-p] [-l] [-c] [-u] [-d] [-e] [-s] [project]
 ```
 
 #### -h, --help
 > show this help message and exit
-
-#### -n, --project-name
-> appoint specific project name
 
 #### -p, --git-pull
 > pull git repository and all sub repositories

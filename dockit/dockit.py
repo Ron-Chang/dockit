@@ -68,15 +68,16 @@ class Dockit:
             + close the same prefix service with current project
             + execute the container with the same as project
 
-    usage: dockit.py [-h] [-n PROJECT_NAME] [-p] [-s] [-l] [-u] [-e] [-d] [-c]
+    usage: dockit.py [-h] [-a] [-p] [-l] [-c] [-u] [-d] [-e] [-s] [project]
+
+    positional arguments:
+      project               appoint specific project name
 
     optional arguments:
       -h, --help            show this help message and exit
-      -p, --git-pull        pull git repository and all sub repositories
-      -n PROJECT_NAME, --project-name PROJECT_NAME
-                            appoint specific project name
       -a, --docker-attach-container
                             to keep attaching mode after docker-compose upped
+      -p, --git-pull        pull git repository and all sub repositories
       -l, --docker-launch-service
                             parse project prefix and launch ${PREFIX}_service
       -c, --docker-close-service
@@ -134,9 +135,10 @@ class Dockit:
     def _get_args(cls):
         parser = argparse.ArgumentParser()
         parser.add_argument(
-            '-n', '--project-name',
+            'project',
             help='appoint specific project name',
             type=str,
+            nargs='?',
         )
         parser.add_argument(
             '-a', '--docker-attach-container',
@@ -204,7 +206,7 @@ class Dockit:
     def _pull_command(cls, path):
         repo = path.split('/')[-1]
         info = subprocess.getoutput(f'git -C {path} pull')
-        if '已經是最新的' in info or 'Already up to date.' in info:
+        if info in ['Already up to date.', '已經是最新的']:
             return f'{cls._FG_YELLOW} {repo:<30} {cls._FG_GREEN}✔︎ {cls._BG_GRAY}  {info}  {cls._RESET}'
         return f'{cls._FG_YELLOW} {repo} {cls._RESET}\n{info}'
 
@@ -284,7 +286,7 @@ class Dockit:
         if not cls._PROJECT_NAME:
             raise Exception('cannot parse project name')
         cls._show_up_info(container=cls._PROJECT_NAME)
-        if args.project_name:
+        if args.project:
             pathname = os.path.expanduser(f'~/{cls._PROJECT_NAME}/docker-compose.yml')
             command = f'docker-compose -f "{pathname}" up'
         else:
@@ -305,7 +307,7 @@ class Dockit:
         if not cls._PROJECT_NAME:
             raise Exception('cannot parse project name')
         cls._show_down_info(container=cls._PROJECT_NAME)
-        if args.project_name:
+        if args.project:
             pathname = os.path.expanduser(f'~/{cls._PROJECT_NAME}/docker-compose.yml')
             command = f'docker-compose -f "{pathname}" down'
         else:
@@ -322,7 +324,7 @@ class Dockit:
             cls._help()
         args = cls._get_args()
         cls._PROJECT_PATH = cls._get_project_path()
-        cls._PROJECT_NAME = args.project_name or cls._get_project_name()
+        cls._PROJECT_NAME = args.project or cls._get_project_name()
         cls._SERVICE_NAME = cls._get_service_name()
 
         """ GIT """

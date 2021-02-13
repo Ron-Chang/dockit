@@ -5,13 +5,15 @@ with open("README.md", "r") as fh:
 
 setup(
     name='dockit',
-    version='0.1.5',  # pypi
-    # version='0.0.4',  # pypi_test
+    version='0.1.6',  # pypi
+    # version='0.0.5',  # pypi_test
     author='Ron Chang',
     author_email='ron.hsien.chang@gmail.com',
     description=(
-        'Fuzzy current location to git pull with all submodules '
-        'or launch, close and exec container through docker-compose.'
+        'Fuzzy the current location to pull all the submodules '
+        'and specify the project if required. '
+        'To launch, close and execute container with docker-compose '
+        'and its relative services without change the directory.'
     ),
     long_description=long_description,
     long_description_content_type='text/markdown',

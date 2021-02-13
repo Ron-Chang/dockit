@@ -1,13 +1,11 @@
 # Dockit
 ## - What is this?
-Fuzzy the current location or appoint specific project name to
-- git
-  + pull repository and all submodules under the repo in anywhere.
 
-- docker
-  + up/down the service which is the "${current_repo_prefix}_service" if not specify.
-  + up/down the container which is the current repo if not specify.
-  + execute the container with the same name as the repo.
+docker
+> To launch, close and execute container with docker-compose and its relative services without change the directory.
+
+git
+> Fuzzy the current location to pull all the submodules and specify the project if required.
 
 ## - History
 
@@ -16,6 +14,7 @@ Fuzzy the current location or appoint specific project name to
 |1|2020/01/24| [v0.1.2](https://github.com/Ron-Chang/dockit#v012)|
 |2|2020/01/27| [v0.1.4](https://github.com/Ron-Chang/dockit#v014)|
 |3|2020/02/02| [v0.1.5](https://github.com/Ron-Chang/dockit#v015)|
+|4|2020/02/13| [v0.1.6](https://github.com/Ron-Chang/dockit#v016)|
 
 #### v0.1.2
 - Fixed dockit -u & -d cannot work properly when the project not located at $HOME directory.
@@ -24,15 +23,22 @@ Fuzzy the current location or appoint specific project name to
 #### v0.1.5
 - Fixed display bug while remote added new branches.
 - Removed optional argument `-n`, use positional argument instead.(default:basename of $pwd)
+#### v0.1.6
+- Support pull a project and the all the submodules which belongs to the project without change the directory.
+- Support change source directory by setting a environment variable `export DOCKIT_ROOT='~/your/custom/path'`.
 
 ## - How to install
+- Install
 ```bash
 pip install dockit
 ```
+- Setup source root(Optional)
+Make it temporary or add the following line to your `.bashrc`, `.zshrc` or profile to keep it permanently.
+```bash
+export DOCKIT_ROOT='~/TO/YOUR/CUSTOM/PATH'
+```
 
 ## - How to use
-
-### CLI
 
 ```bash
 dockit.py [-h] [-a] [-p] [-l] [-c] [-u] [-d] [-e] [-s] [project]

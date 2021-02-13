@@ -10,8 +10,6 @@ class Dyer:
 
     _RESETALL = '\x1b[0m'
     _STYLE = '\x1b[{style}'
-    _FG = '3{fg}'
-    _BG = '4{bg}'
 
     class Style:
         NORMAL = 0
@@ -90,6 +88,9 @@ class Dockit:
                             docker exec -it container bash
       -s, --docker-show-containers
                             show docker processes
+
+    You can change your service source path by setup environment variable
+    export DOCKIT_ROOT='~/Documents/'
     """
 
     _RESET = Dyer.reset()
@@ -116,6 +117,8 @@ class Dockit:
     _GRAY_ON_RED = Dyer.dye(fg=Dyer.Color.GRAY, bg=Dyer.Color.RED)
     _YELLOW_ON_RED = Dyer.dye(fg=Dyer.Color.YELLOW, bg=Dyer.Color.RED)
     _YELLOW_ON_BLUE = Dyer.dye(fg=Dyer.Color.YELLOW, bg=Dyer.Color.BLUE)
+
+    _ROOT = os.environ.get('DOCKIT_ROOT', '~')
 
     _PROJECT_PATH = str()
     _PROJECT_NAME = str()
@@ -197,10 +200,10 @@ class Dockit:
         prefix = cls._PROJECT_NAME.split('_', 1)[0]
         return f'{prefix}_service'
 
-    @classmethod
-    def _get_submodules(cls):
-        stdout = subprocess.getoutput(f'grep path \'{cls._PROJECT_PATH}/.gitmodules\' | sed \'s/.*= //\'')
-        return {f'{cls._PROJECT_PATH}/{submodule}' for submodule in stdout.split('\n')}
+    @staticmethod
+    def _get_submodules(project_path):
+        stdout = subprocess.getoutput(f'grep path \'{project_path}/.gitmodules\' | sed \'s/.*= //\'')
+        return {f'{project_path}/{submodule}' for submodule in stdout.split('\n')}
 
     @classmethod
     def _pull_command(cls, path):
@@ -211,17 +214,27 @@ class Dockit:
         return f'{cls._FG_YELLOW} {repo} {cls._RESET}\n{info}'
 
     @classmethod
-    def _git_pull(cls):
+    def _git_pull(cls, args):
         """
-        grep path '{cls._PROJECT_PATH}/.gitmodules' | sed 's/.*= //' | xargs -I@ git -C {cls._PROJECT_PATH}/@ pull
+        grep path '{project_path}/.gitmodules' | sed 's/.*= //' | xargs -I@ git -C {project_path}/@ pull
         """
-        info = cls._pull_command(path=cls._PROJECT_PATH)
+        project_path = cls._PROJECT_PATH
+        if args.project:
+            pathname = os.path.join(f'{cls._ROOT}', f'{cls._PROJECT_NAME}')
+            project_path = os.path.expanduser(pathname)
+        info = cls._pull_command(path=project_path)
         print(f'{cls._BG_BLUE} {"REPOSITORY":10}  {cls._RESET} {info}')
-        if not os.path.isfile(f'{cls._PROJECT_PATH}/.gitmodules'):
+        submodule_pathname = os.path.join(f'{project_path}', '.gitmodules')
+        if not os.path.isfile(submodule_pathname):
             sys.exit()
-        for submodule in cls._get_submodules():
+        for submodule in cls._get_submodules(project_path):
             info = cls._pull_command(path=submodule)
             print(f'{cls._BG_CYAN}  {"SUBMODULE":10}  {cls._RESET} {info}')
+
+    @classmethod
+    def _get_compose_pathname(cls, project_name):
+        pathname = os.path.join(f'{cls._ROOT}', f'{project_name}/docker-compose.yml')
+        return os.path.expanduser(pathname)
 
     @classmethod
     def _show_launch_service_info(cls, service):
@@ -235,9 +248,10 @@ class Dockit:
         service = cls._SERVICE_NAME
         if not service:
             raise Exception('service name not found')
-        pathname = os.path.expanduser(f'~/{service}/docker-compose.yml')
+        compose_pathname = cls._get_compose_pathname(project_name=service)
+        command = f'docker-compose -f "{compose_pathname}" up -d'
         cls._show_launch_service_info(service=service)
-        os.system(f'docker-compose -f "{pathname}" up -d')
+        os.system(command)
 
     @classmethod
     def _show_close_service_info(cls, service):
@@ -251,9 +265,10 @@ class Dockit:
         service= cls._SERVICE_NAME
         if not service:
             raise Exception('service name not found')
-        pathname = os.path.expanduser(f'~/{service}/docker-compose.yml')
+        compose_pathname = cls._get_compose_pathname(project_name=service)
+        command = f'docker-compose -f "{compose_pathname}" down'
         cls._show_close_service_info(service=service)
-        os.system(f'docker-compose -f "{pathname}" down')
+        os.system(command)
 
     @classmethod
     def _show_exec_info(cls, container):
@@ -270,7 +285,7 @@ class Dockit:
         if not container:
             raise Exception('cannot parse project name')
         if not subprocess.getoutput(f'docker ps -q -f name={container}'):
-            raise Exception('container not found')
+            raise Exception(f'{cls._PROJECT_NAME} is not exist')
         cls._show_exec_info(container=container)
         os.system(f'docker exec -it {container} bash -l')
 
@@ -287,8 +302,8 @@ class Dockit:
             raise Exception('cannot parse project name')
         cls._show_up_info(container=cls._PROJECT_NAME)
         if args.project:
-            pathname = os.path.expanduser(f'~/{cls._PROJECT_NAME}/docker-compose.yml')
-            command = f'docker-compose -f "{pathname}" up'
+            compose_pathname = cls._get_compose_pathname(project_name=cls._PROJECT_NAME)
+            command = f'docker-compose -f "{compose_pathname}" up'
         else:
             command = f'docker-compose up'
         if args.docker_attach_container:
@@ -308,8 +323,8 @@ class Dockit:
             raise Exception('cannot parse project name')
         cls._show_down_info(container=cls._PROJECT_NAME)
         if args.project:
-            pathname = os.path.expanduser(f'~/{cls._PROJECT_NAME}/docker-compose.yml')
-            command = f'docker-compose -f "{pathname}" down'
+            compose_pathname = cls._get_compose_pathname(project_name=cls._PROJECT_NAME)
+            command = f'docker-compose -f "{compose_pathname}" down'
         else:
             command = f'docker-compose down'
         os.system(command)
@@ -329,7 +344,7 @@ class Dockit:
 
         """ GIT """
         if args.git_pull:
-            cls._git_pull()
+            cls._git_pull(args)
 
         """ CONTAINER """
         if args.docker_launch_service:
@@ -345,3 +360,6 @@ class Dockit:
         if args.docker_show_containers:
             cls._show_containers()
 
+
+if __name__ == '__main__':
+    Dockit.cli()

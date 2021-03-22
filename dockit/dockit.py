@@ -287,7 +287,7 @@ class Dockit:
         if not subprocess.getoutput(f'docker ps -q -f name={container}'):
             raise Exception(f'{cls._PROJECT_NAME} is not exist')
         cls._show_exec_info(container=container)
-        os.system(f'docker exec -it {container} bash -l')
+        os.system(f'docker exec -it {container} bash')
 
     @classmethod
     def _show_up_info(cls, container):

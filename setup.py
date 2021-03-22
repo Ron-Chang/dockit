@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='dockit',
-    version='0.1.6',  # pypi
+    version='0.1.7',  # pypi
     # version='0.0.5',  # pypi_test
     author='Ron Chang',
     author_email='ron.hsien.chang@gmail.com',

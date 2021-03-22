@@ -15,6 +15,7 @@ git
 |2|2020/01/27| [v0.1.4](https://github.com/Ron-Chang/dockit#v014)|
 |3|2020/02/02| [v0.1.5](https://github.com/Ron-Chang/dockit#v015)|
 |4|2020/02/13| [v0.1.6](https://github.com/Ron-Chang/dockit#v016)|
+|5|2020/03/22| [v0.1.7](https://github.com/Ron-Chang/dockit#v017)|
 
 #### v0.1.2
 - Fixed dockit -u & -d cannot work properly when the project not located at $HOME directory.
@@ -26,6 +27,8 @@ git
 #### v0.1.6
 - Support pull a project and the all the submodules which belongs to the project without change the directory.
 - Support change source directory by setting a environment variable `export DOCKIT_ROOT='~/your/custom/path'`.
+#### v0.1.7
+- Removed -l flag of _exec_container to solve some container cannot call go properly
 
 ## - How to install
 - Install
